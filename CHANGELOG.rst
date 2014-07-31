@@ -1,5 +1,13 @@
 This file includes migration steps for each release of CGXP.
 
+Version 1.6
+===========
+
+1. We start to use the MapFishPrint version 3 then in the ``cgxp_print`` 
+   plugin, ``fields`` is deprecated, it will be replaced by
+   ``additionalAttributes``.
+
+
 Version 1.5
 ===========
 
