@@ -19,6 +19,10 @@
  * @requires plugins/Tool.js
  * @include OpenLayers/BaseTypes/LonLat.js
  * @include OpenLayers/Projection.js
+ * @include OpenLayers/Layer/Vector.js
+ * @include OpenLayers/Feature/Vector.js
+ * @include OpenLayers/Geometry/Point.js
+ * @include OpenLayers/Geometry/Polygon.js
  */
 
 /** api: (define)
@@ -57,9 +61,41 @@ cgxp.plugins.MyPosition = Ext.extend(gxp.plugins.Tool, {
 
     /** api: config[recenteringZoom]
      *  ``Number``
+     *
      *  Zoomlevel to use when recentering to the user's location. Default is 11. 
      */
     recenteringZoom: 11,
+
+    /** api: config[drawAccuracy]
+     *  ``Boolean``
+     *
+     *  If true, a circle is displayed around the user's position,
+     *  showing the accuracy of the geolocation. Default is false. 
+     */
+    drawAccuracy: false,
+
+    /** api: config[stylePoint]
+    * ``Object`` 
+    * 
+    * Feature style hash to apply to the
+    * position marker, default is {pointRadius: 4}.
+    */
+    stylePoint: {
+        pointRadius: 4,
+    },
+
+    /** api: config[styleAccuracy]
+    * ``Object`` 
+    *
+    * Feature style hash to apply to the
+    * accuracy circle, default is
+    * {fillColor: "#f70082", strokeColor: "#f70082", fillOpacity: 0.4}.
+    */
+    styleAccuracy: {
+        fillColor: "#f70082",
+        strokeColor: "#f70082",
+        fillOpacity: 0.4
+    },
 
     /** i18n */
     actionTooltip: "Recenter to my location",
@@ -70,19 +106,31 @@ cgxp.plugins.MyPosition = Ext.extend(gxp.plugins.Tool, {
         if (!('geolocation' in navigator)) return [];
 
         var map = this.target.mapPanel.map;
+        var layer = new OpenLayers.Layer.Vector("Geolocation");
+        map.addLayer(layer);
+        var circle = new OpenLayers.Feature.Vector(null, {}, this.styleAccuracy);
+        var marker = new OpenLayers.Feature.Vector(null, {}, this.stylePoint);
         var button = new Ext.Button({
             tooltip: this.actionTooltip,
             iconCls: 'myposition',
             handler: function() {
-                var recenteringZoom = this.recenteringZoom;
+                var self = this;
                 navigator.geolocation.getCurrentPosition(function(pos) {
                     var position = new OpenLayers.LonLat(pos.coords.longitude,
                                                          pos.coords.latitude);
                     position.transform(new OpenLayers.Projection("EPSG:4326"),
                                        map.getProjectionObject());
-                    var zoom = Math.max(recenteringZoom, map.getZoom());
+                    var zoom = Math.max(self.recenteringZoom, map.getZoom());
                     map.setCenter(position, zoom);
-                });
+                    if (self.drawAccuracy) {
+                        layer.removeFeatures([circle, marker]);
+                        var center = new OpenLayers.Geometry.Point(position.lon, position.lat);
+                        circle.geometry = new OpenLayers.Geometry.Polygon.createRegularPolygon(
+                            center, pos.coords.accuracy, 40, 0);
+                        marker.geometry = center;
+                        layer.addFeatures([circle, marker]);
+                    };
+                }); 
             },
             scope: this
         });
