@@ -107,7 +107,8 @@ cgxp.plugins.MyPosition = Ext.extend(gxp.plugins.Tool, {
 
         var map = this.target.mapPanel.map;
         var layer = new OpenLayers.Layer.Vector("Geolocation");
-        map.addLayer(layer);
+        this.layer = layer
+        this.target.on('ready', this.viewerReady, this);
         var circle = new OpenLayers.Feature.Vector(null, {}, this.styleAccuracy);
         var marker = new OpenLayers.Feature.Vector(null, {}, this.stylePoint);
         var button = new Ext.Button({
@@ -123,12 +124,12 @@ cgxp.plugins.MyPosition = Ext.extend(gxp.plugins.Tool, {
                     var zoom = Math.max(self.recenteringZoom, map.getZoom());
                     map.setCenter(position, zoom);
                     if (self.drawAccuracy) {
-                        layer.removeFeatures([circle, marker]);
+                        self.layer.removeFeatures([circle, marker]);
                         var center = new OpenLayers.Geometry.Point(position.lon, position.lat);
                         circle.geometry = new OpenLayers.Geometry.Polygon.createRegularPolygon(
                             center, pos.coords.accuracy, 40, 0);
                         marker.geometry = center;
-                        layer.addFeatures([circle, marker]);
+                        self.layer.addFeatures([circle, marker]);
                     };
                 }); 
             },
@@ -136,6 +137,12 @@ cgxp.plugins.MyPosition = Ext.extend(gxp.plugins.Tool, {
         });
 
         return cgxp.plugins.MyPosition.superclass.addActions.apply(this, [button]);
+    },
+
+    /** private: method[viewerReady]
+    */
+    viewerReady: function() {
+        this.target.mapPanel.map.addLayer(this.layer);
     }
 });
 
