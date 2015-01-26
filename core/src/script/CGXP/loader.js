@@ -21,6 +21,7 @@
         "cgxp.js",
 
         "tools/tools.js",
+        "tools/autoProject.js",
 
         "widgets/FullTextSearch.js",
         "widgets/MapPanel.js",

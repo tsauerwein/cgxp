@@ -73,6 +73,15 @@ cgxp.MapPanel = Ext.extend(GeoExt.MapPanel, {
      */
     crosshairStyle: {},
 
+    /** api: config[projectionCodes]
+    * ``Array``
+    *
+    * List of EPSG codes of projections that should be used when trying to
+    * recenter on coordinates. Leftmost projections are used preferably.
+    * Default is current map projection.
+    */
+    projectionCodes: null,
+
     /** private: property[params]
      *  ``Object``
      *  The layers params, read only.
@@ -101,6 +110,8 @@ cgxp.MapPanel = Ext.extend(GeoExt.MapPanel, {
              */
             'paramschange'
         );
+        // define projections that may be used for coordinates recentering
+        this.autoProjection = new OpenLayers.AutoProjection(this);
     },
 
     /** private: method[getState]
@@ -148,6 +159,10 @@ cgxp.MapPanel = Ext.extend(GeoExt.MapPanel, {
      */
     applyState: function(state) {
         this.initialState = state;
+        [state.x, state.y] = this.autoProjection.tryProjection(
+                                 [state.x, state.y],
+                                 this.map);
+        
         cgxp.MapPanel.superclass.applyState.apply(this, arguments);
         if (state.crosshair && state.x && state.y) {
             this.getVectorLayer().addFeatures([

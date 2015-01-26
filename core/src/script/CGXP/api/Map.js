@@ -33,6 +33,7 @@
  * @include OpenLayers/Format/Text.js
  * @include OpenLayers/Popup/FramedCloud.js
  * @include OpenLayers/Control/SelectFeature.js
+ * @include CGXP/tools/autoProject.js
  */
 
 /** api: (define)
@@ -217,6 +218,13 @@ cgxp.api.Map.prototype = {
     onViewerReady: function(viewer) {
         var i;
         this.map = viewer.mapPanel.map;
+        this.autoProjection = new OpenLayers.AutoProjection(viewer.map); 
+
+        if (typeof this.userConfig.center != 'undefined') {
+            var zoom = (typeof this.userConfig.zoom == 'undefined' ? 10 :
+                        this.userConfig.zoom);
+            this.recenter(this.userConfig.center, zoom);
+        }
 
         var config = this.userConfig;
 
@@ -239,6 +247,8 @@ cgxp.api.Map.prototype = {
      *  Convenience method to create a map from a config.
      */
     initMapFromConfig: function(config) {
+        this.autoProjection = new OpenLayers.AutoProjection(config); 
+
         this.adaptConfig(config);
 
         var i;
@@ -249,8 +259,10 @@ cgxp.api.Map.prototype = {
         }
 
         OpenLayers.Util.extend(config, this.userConfig);
-
         this.map = new OpenLayers.Map(config);
+        if ( typeof(config.center) != 'undefined') {
+            this.recenter(config.center, config.zoom); 
+        }
 
         this.addOverlayLayers(this.userConfig.overlays);
         this.onMapCreated();
@@ -357,6 +369,7 @@ cgxp.api.Map.prototype = {
                 OpenLayers.Function.bind(this.recenter, this, center, zoom));
             return;
         }
+        center = this.autoProjection.tryProjection(center, this.map);
         this.map.setCenter(new OpenLayers.LonLat(center[0], center[1]), zoom);
     },
 
@@ -421,6 +434,10 @@ cgxp.api.Map.prototype = {
             return;
         }
         options = options || {};
+        if (typeof options.position != 'undefined'){
+            options.position = this.autoProjection.tryProjection(options.position, this.map);
+        }
+       
         var lonlat = (options.position) ?
             new OpenLayers.LonLat(options.position[0], options.position[1]) :
             this.map.getCenter();
