@@ -39,7 +39,7 @@ OpenLayers.AutoProjection = OpenLayers.Class({
     projections: null,
 
     /** private: method[buildProjectionList]
-     *  :arg config: ``Object`` the map config
+     *  :arg config: ``Object`` the object containing projection Codes
      *
      *  Take a list of projection codes in config.projectionCodes
      *  and fill the projections dictionary with Openlayers.Projection
@@ -63,7 +63,7 @@ OpenLayers.AutoProjection = OpenLayers.Class({
 
     /** private: method[tryProjection]
      *  :arg point: ``Array`` point to project
-     *  :arg config: ``Object`` object containing projection Codes
+     *  :arg map: ``Object`` the map object
      *
      *  Project the point using the projections list
      *  and find the first projection for which the it
@@ -87,5 +87,5 @@ OpenLayers.AutoProjection = OpenLayers.Class({
         return projectedPoint;
     },
 
- CLASS_NAME: "OpenLayers.AutoProjection"
+    CLASS_NAME: "OpenLayers.AutoProjection"
 });

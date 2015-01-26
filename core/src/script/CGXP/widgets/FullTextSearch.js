@@ -116,18 +116,6 @@ cgxp.FullTextSearch = Ext.extend(Ext.Panel, {
      */
     limits: {},
 
-    /** api: config[projectionCodes]
-     *  ``Array``
-     *  List of EPSG codes of projections that should be used when trying to
-     *  recenter on coordinates. Leftmost projections are used preferably.
-     *  Default is current map projection.
-     */
-    projectionCodes: null,
-
-    /** private: property[projections]
-     */
-    projections: null,
-
     /** private: method[initComponent]
      */
     initComponent: function() {
@@ -167,8 +155,10 @@ cgxp.FullTextSearch = Ext.extend(Ext.Panel, {
                 var left = parseFloat(coords[1].replace("'", ""));
                 var right = parseFloat(coords[2].replace("'", ""));
 
-                this.position = this.autoProjection.tryProjection([right, left], map); 
-                this.position = this.autoProjection.tryProjection([left, right], map);
+                this.position = this.autoProjection.tryProjection([left, right], map); 
+                if (this.position[0] == left && this.position[1] == right){
+                    this.position = this.autoProjection.tryProjection([right, left], map);
+                }
                 if (this.position) {
                     this.closeLoading.cancel();
                     // close the loading twin box.
