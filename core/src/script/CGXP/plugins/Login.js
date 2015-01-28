@@ -138,6 +138,14 @@ cgxp.plugins.Login = Ext.extend(gxp.plugins.Tool, {
      */
     ignoreExistingPermalink: false,
 
+    /** api: config[neverUseCurrentContext]
+     *  ``Boolean`` 
+     *  If true, will zoom to the extent set in the admin role setup at login.
+     *
+     *  Default: false
+     */
+    neverUseCurrentContext: false,
+
     /** api: config[enablePasswordChange]
      *  ``Boolean``
      *  if set to true, a menu is enabled, allowing the user to change his
@@ -542,10 +550,15 @@ cgxp.plugins.Login = Ext.extend(gxp.plugins.Tool, {
         var targetUrl;
         var currentUrl = window.location.href;
 
-        if (this.permalinkId == null) {
+        if (this.neverUseCurrentContext && this.permalinkId == null) {
             alert('permalinkId is missing in your login plugin config.');
             return currentUrl;
         }
+
+        if (this.neverUseCurrentContext){
+            return currentUrl;
+        }
+
         // map_x is used as an indicator of existing permalink
         if (!this.ignoreExistingPermalink && 
               window.location.search.indexOf('map_x') > -1) {
