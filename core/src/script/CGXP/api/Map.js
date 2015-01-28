@@ -41,6 +41,26 @@
  *  class = Map
  */
 
+/** api: autoprojection - example
+ *  
+ *  Sample code showing how to configure the mappanel for autoprojection.
+ *  Here, the application is in 21781, the restricted extent corresponds to 
+ *  Swiss boundaries, and supported projection are 21781 and 2056.
+ *
+ *  The autoprojection will be enabled for API and XAPI.
+ *
+ *  .. code-block:: javascript
+ *
+ *      ...
+ *      var mapConfig = {
+ *          xtype: 'cgxp_mappanel',
+ *          restrictedExtent: RESTRICTED_EXTENT,
+ *          projectionCodes: [3857, 21781, 2056],
+ *          projection: new OpenLayers.Projection("EPSG:3857"),
+ *          ...
+ *      }
+ */
+
 if (!window.cgxp) {
     cgxp = {};
 }

@@ -60,6 +60,29 @@ Ext.namespace("cgxp");
  *   - Example: ``&map_tooltip=sometext``
  *
  */
+
+/** api: autoprojection - example
+ *  
+ *  Sample code showing how to configure the mappanel for autoprojection.
+ *  Here, the application is in 21781, the restricted extent corresponds to 
+ *  Swiss boundaries, and supported projection are 21781 and 2056.
+ *
+ *  The autoprojection will be enabled for URL and FTS.
+ *
+ *  .. code-block:: javascript
+ *
+ *      new gxp.Viewer({
+ *          ...
+ *          map: {
+ *              id: "app-map", // id needed to reference map in portalConfig above
+ *              xtype: 'cgxp_mappanel',
+ *              ...
+ *              projection: new OpenLayers.Projection("EPSG:21781"),
+ *              restrictedExtent: RESTRICTED_EXTENT: [480000, 60000, 840000, 300000],
+ *              projectionCodes: ["21781", "2056"],
+ *          ...
+ */
+
 cgxp.MapPanel = Ext.extend(GeoExt.MapPanel, {
 
     /** private: property[vectorLayer]
